@@ -32,7 +32,7 @@
 		};
 
 		if ( is_single() ) {
-			the_title( '<h1 class="entry-title">', '</h1>' );
+			the_excerpt();
 		} elseif ( is_front_page() && is_home() ) {
 			the_title( '<h3 class="entry-title"><a href="' . esc_url( get_permalink() ) . '" rel="bookmark">', '</a></h3>' );
 		} else {
@@ -51,12 +51,8 @@
 
 	<div class="entry-content">
 		<?php
-		/* translators: %s: Name of current post */
-		the_content( sprintf(
-			__( 'Continue reading<span class="screen-reader-text"> "%s"</span>', 'twentyseventeen' ),
-			get_the_title()
-		) );
 
+		echo "<img src='https://devrix.com/shop/wp-content/themes/devrix-v2/assets/images/img-dixy-standing-right.png'>";
 		wp_link_pages( array(
 			'before'      => '<div class="page-links">' . __( 'Pages:', 'twentyseventeen' ),
 			'after'       => '</div>',

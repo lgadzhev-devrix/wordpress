@@ -13,7 +13,7 @@ if ( have_posts() ) :
 
         <h3><?php the_title() ?></h3>
 
-        <p><?php the_content() ?></p>
+        <p id="custom-page-content"><?php the_content() ?></p>
 
         <p><?php the_date() ?></p>
 

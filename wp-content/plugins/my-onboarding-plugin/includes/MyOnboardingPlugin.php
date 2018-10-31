@@ -32,7 +32,13 @@ class MyOnboardingPlugin
 
     function my_onboarding_submenu()
     {
-        add_submenu_page('options-general.php',
+        add_menu_page("My Onboarding Page",
+            "Onboarding",
+            "manage_options",
+            "my_onboarding",
+            array( $this, 'my_onboarding_page' ));
+
+        add_submenu_page('my_onboarding',
             'My Onboarding',
             'My Onboarding',
             'manage_options',

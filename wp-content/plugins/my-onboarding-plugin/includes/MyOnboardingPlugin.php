@@ -4,6 +4,7 @@ class MyOnboardingPlugin
 {
     function __construct()
     {
+        add_action( 'wp_ajax_change_filter', array( $this, 'change_filter_option' ));
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueue' ) );
         add_action('admin_menu', array($this, 'my_onboarding_submenu'));
     }
@@ -13,6 +14,7 @@ class MyOnboardingPlugin
      */
     function activate()
     {
+        add_option( 'my_onboarding_filter', '1' );
         flush_rewrite_rules();
     }
     /**
@@ -35,11 +37,17 @@ class MyOnboardingPlugin
             'My Onboarding',
             'manage_options',
             'my_onboarding',
-            'my_onboarding_page');
+            array( $this, 'my_onboarding_page' ));
     }
 
     function my_onboarding_page()
     {
+        require_once ( 'templates/my-onboarding.php');
+    }
 
+    function change_filter_option()
+    {
+        update_option( 'my_onboarding_filter', intval( $_POST['filters_enabled']) );
+        wp_die();
     }
 }

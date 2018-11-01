@@ -6,7 +6,7 @@ class MyOnboardingPlugin
     {
         add_action( 'wp_ajax_change_filter', array( $this, 'change_filter_option' ));
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueue' ) );
-        add_action('admin_menu', array($this, 'my_onboarding_submenu'));
+        add_action( 'admin_menu', array($this, 'my_onboarding_submenu'));
     }
 
     /**

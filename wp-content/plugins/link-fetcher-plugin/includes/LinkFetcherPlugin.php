@@ -2,7 +2,7 @@
 
 class LinkFetcherPlugin
 {
-    function __construct()
+    public function __construct()
     {
         add_action( 'wp_ajax_fetch_uri', array( $this, 'fetch_uri' ));
         add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue' ) );
@@ -12,24 +12,24 @@ class LinkFetcherPlugin
     /**
      * Activates the plugin
      */
-    function activate()
+    public function activate()
     {
         flush_rewrite_rules();
     }
     /**
      * Deactivates the plugin
      */
-    function deactivate()
+    public function deactivate()
     {
         flush_rewrite_rules();
     }
 
-    function admin_enqueue()
+    public function admin_enqueue()
     {
         wp_enqueue_script( 'link_fetcher_script', plugins_url( '../assets/admin_script.js', __FILE__ ), array( 'jquery' ) );
     }
 
-    function link_fetcher_menu()
+    public function link_fetcher_menu()
     {
         add_menu_page("Link Fetcher",
             "Link Fetcher",
@@ -45,17 +45,33 @@ class LinkFetcherPlugin
             array( $this, 'link_fetcher_page' ));
     }
 
-    function link_fetcher_page()
+    public function link_fetcher_page()
     {
         require_once ( 'templates/link-fetcher.php');
     }
 
-    function fetch_uri()
+    public function fetch_uri()
     {
-        $response =  wp_remote_get( esc_url( $_POST['fetch_uri'] ) );
+        $uri = esc_url( $_POST['fetch_uri'] );
+        $duration = intval( $_POST['cache_duration']);
 
-        echo $response['body'];
+        $response =  $this->transient_request($uri, $duration);
+
+        echo $response;
 
         wp_die();
+    }
+
+    protected function transient_request($uri, $duration)
+    {
+        $transient_string = get_transient( $uri . '-cache' );
+
+        if ( false === $transient_string ) {
+            $content = wp_remote_get( $uri )['body'];
+            set_transient($uri . '-cache', $content, $duration * MINUTE_IN_SECONDS );
+            $transient_string = get_transient( $uri . '-cache' );
+        }
+
+        return $transient_string;
     }
 }

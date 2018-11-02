@@ -52,7 +52,7 @@ class LinkFetcherPlugin
 
     function fetch_uri()
     {
-        $response = wp_remote_get( $_POST['fetch_uri'] );
+        $response =  wp_remote_get( esc_url( $_POST['fetch_uri'] ) );
 
         echo $response['body'];
 

@@ -11,11 +11,18 @@ class MyOnboardingPlugin {
 		add_action( 'init', array( $this, 'custom_post_type' ) );
 		add_filter( 'archive_template', array( $this, 'filter_archive_page' ) );
 		add_action( 'wp_ajax_change_filter', array( $this, 'change_filter_option' ) );
-		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_site' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin' ) );
 		add_action( 'admin_menu', array( $this, 'my_onboarding_submenu' ) );
 		add_action( 'add_meta_boxes', array( $this, 'add_student_info_meta_boxes' ) );
 		add_action( 'save_post', array( $this, 'student_city_country_save' ), 1, 2 );
 		add_filter( 'single_template', array( $this, 'single_custom_template' ) );
+		add_filter( 'manage_edit-student_columns', array( $this, 'add_custom_column_disable_student' ) );
+		add_action( 'manage_student_posts_custom_column', array(
+			$this,
+			'manage_custom_column_disable_student'
+		), 10, 2 );
+		add_action( 'wp_ajax_student_status', array( $this, 'disable_student' ) );
 	}
 
 	/**
@@ -34,10 +41,17 @@ class MyOnboardingPlugin {
 	}
 
 	/**
-	 * Enqueue script
+	 * Enqueue script site
 	 */
-	function enqueue() {
+	function enqueue_site() {
 		wp_enqueue_script( 'mypluginscript', plugins_url( '../assets/script.js', __FILE__ ), array( 'jquery' ) );
+	}
+
+	/**
+	 * Enqueue script admin
+	 */
+	function enqueue_admin() {
+		wp_enqueue_script( 'mypluginscriptadmin', plugins_url( '../assets/script_admin.js', __FILE__ ), array( 'jquery' ) );
 	}
 
 	/**
@@ -272,6 +286,13 @@ class MyOnboardingPlugin {
 		endforeach;
 	}
 
+	/**
+	 * Create single page for our plugin
+	 *
+	 * @param $single
+	 *
+	 * @return string
+	 */
 	function single_custom_template( $single ) {
 		global $post;
 
@@ -282,5 +303,54 @@ class MyOnboardingPlugin {
 		}
 
 		return $single;
+	}
+
+	/**
+	 * Add custom column
+	 *
+	 * @param $columns
+	 *
+	 * @return mixed
+	 */
+	function add_custom_column_disable_student( $columns ) {
+		$columns['disabled'] = "Disabled";
+
+		return $columns;
+	}
+
+	/**
+	 * Construct the markup
+	 *
+	 * @param $column
+	 * @param $post_id
+	 */
+	function manage_custom_column_disable_student( $column, $post_id ) {
+		global $post;
+
+		switch ( $column ) {
+			case 'disabled':
+
+				if ( get_post_meta( $post_id, 'disabled_student', true ) ) {
+					echo "<input type='checkbox' class='disabled_student' id='$post_id' checked>";
+				} else {
+					echo "<input type='checkbox' class='disabled_student' id='$post_id' >";
+				};
+		}
+	}
+
+	/**
+	 * Update the DB meta field
+	 */
+	function disable_student() {
+		$post_id = $_POST['post_id'];
+		$checked = $_POST['checked'];
+
+		if ( get_post_meta( $post_id, 'disabled_student', false ) ) {
+			// If the custom field already has a value, update it.
+			update_post_meta( $post_id, 'disabled_student', $checked );
+		} else {
+			// If the custom field doesn't have a value, add it.
+			add_post_meta( $post_id, 'disabled_student', $checked );
+		}
 	}
 }

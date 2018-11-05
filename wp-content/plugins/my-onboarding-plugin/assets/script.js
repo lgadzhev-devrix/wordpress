@@ -1,5 +1,6 @@
-jQuery(document).ready(function () {
+jQuery(document).ready(function ($) {
 
+    //Filter AJAX
     var content = jQuery("#custom-page-content");
 
     content.before().prepend("<p id='onboardingFilter'>Onboarding Filter: </p>");
@@ -9,4 +10,5 @@ jQuery(document).ready(function () {
     onboardingfilter.append("<p>by Lachezar</p>");
 
     content.append("<div style='display: none;'></div>");
+
 });

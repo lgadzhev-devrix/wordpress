@@ -15,6 +15,7 @@ class MyOnboardingPlugin {
 		add_action( 'admin_menu', array( $this, 'my_onboarding_submenu' ) );
 		add_action( 'add_meta_boxes', array( $this, 'add_student_info_meta_boxes' ) );
 		add_action( 'save_post', array( $this, 'student_city_country_save' ), 1, 2 );
+		add_filter( 'single_template', array( $this, 'single_custom_template' ) );
 	}
 
 	/**
@@ -271,4 +272,15 @@ class MyOnboardingPlugin {
 		endforeach;
 	}
 
+	function single_custom_template( $single ) {
+		global $post;
+
+		if ( $post->post_type == 'student' ) {
+			if ( file_exists( dirname( __FILE__ ) . '/templates/single-student.php' ) ) {
+				return dirname( __FILE__ ) . '/templates/single-student.php';
+			}
+		}
+
+		return $single;
+	}
 }

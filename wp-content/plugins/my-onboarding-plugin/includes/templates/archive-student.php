@@ -7,7 +7,13 @@ get_header();
 $limitToFour = new WP_Query( array(
 	'post_type'      => 'student',
 	'posts_per_page' => 4,
-	'paged' => (get_query_var('paged')) ? get_query_var('paged') : 1
+	'paged' => (get_query_var('paged')) ? get_query_var('paged') : 1,
+	'meta_query' => array(
+		array(
+			'key'     => 'disabled_student',
+			'value'   => 'false',
+		),
+	),
 ) );
 
 if ( $limitToFour->have_posts() ) : ?>

@@ -369,7 +369,7 @@ class MyOnboardingPlugin {
 
 		$student = new WP_Query( array(
 			'post_type' => 'student',
-			'p'         => $atts['student_id']
+			'p'         => $a['student_id']
 		) );
 
 		$result = null;

@@ -23,6 +23,7 @@ class MyOnboardingPlugin {
 			'manage_custom_column_disable_student'
 		), 10, 2 );
 		add_action( 'wp_ajax_student_status', array( $this, 'disable_student' ) );
+		add_shortcode( 'student', array( $this, 'display_student' ) );
 	}
 
 	/**
@@ -352,5 +353,38 @@ class MyOnboardingPlugin {
 			// If the custom field doesn't have a value, add it.
 			add_post_meta( $post_id, 'disabled_student', $checked );
 		}
+	}
+
+	/**
+	 * Result for shortcode
+	 *
+	 * @param $atts
+	 *
+	 * @return null|string
+	 */
+	function display_student( $atts ) {
+		$a = shortcode_atts( array(
+			'student_id' => null,
+		), $atts );
+
+		$student = new WP_Query( array(
+			'post_type' => 'student',
+			'p'         => $atts['student_id']
+		) );
+
+		$result = null;
+
+		if ( $student->have_posts() ) {
+			while ( $student->have_posts() ) : $student->the_post();
+				$result = "<div>" . the_post_thumbnail() . "</div>" .
+				          "<div>" . the_title() . "</div>" .
+				          "<div>" . get_post_meta( get_the_ID(), 'student_class_grade', true ) . "</div>";
+			endwhile;
+		} else {
+			$result = 'Student not found!';
+		}
+		wp_reset_postdata();
+
+		return $result;
 	}
 }

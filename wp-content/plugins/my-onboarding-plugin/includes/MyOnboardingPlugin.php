@@ -25,6 +25,7 @@ class MyOnboardingPlugin {
 		add_action( 'wp_ajax_student_status', array( $this, 'disable_student' ) );
 		add_shortcode( 'student', array( $this, 'display_student' ) );
 		add_action( 'widgets_init', array( $this, 'register_widget' ) );
+		add_action( 'widgets_init', array( $this, 'my_custom_sidebar' ) );
 	}
 
 	/**
@@ -393,5 +394,18 @@ class MyOnboardingPlugin {
 	{
 		require_once ( 'MyOnboardingWidget.php');
 		register_widget( 'MyOnboardingWidget' );
+	}
+
+	function my_custom_sidebar() {
+		register_sidebar(
+			array (
+				'name' => 'My Sidebar',
+				'id' => 'custom-side-bar',
+				'before_widget' => '<div class="widget-content">',
+				'after_widget' => "</div>",
+				'before_title' => '<h3 class="widget-title">',
+				'after_title' => '</h3>',
+			)
+		);
 	}
 }

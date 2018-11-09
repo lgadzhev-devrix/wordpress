@@ -119,9 +119,9 @@ class MyOnboardingWidget extends WP_Widget {
 			/* Start the Loop */
 			while ( $limitPosts->have_posts() ) : $limitPosts->the_post();
 				the_title(
-				        '<h6 class="entry-title"><a href="' .
-                        esc_url( get_permalink() ) .
-                        '" rel="bookmark">', '</a></h6>' );
+					'<h6 class="entry-title"><a href="' .
+					esc_url( get_permalink() ) .
+					'" rel="bookmark">', '</a></h6>' );
 			endwhile;
 		endif;
 

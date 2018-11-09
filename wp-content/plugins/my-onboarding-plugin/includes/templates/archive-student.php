@@ -4,7 +4,7 @@
  */
 get_header();
 
-$limitToFour = new WP_Query( array(
+$limitPosts = new WP_Query( array(
 	'post_type'      => 'student',
 	'posts_per_page' => 4,
 	'paged' => (get_query_var('paged')) ? get_query_var('paged') : 1,
@@ -16,10 +16,10 @@ $limitToFour = new WP_Query( array(
 	),
 ) );
 
-if ( $limitToFour->have_posts() ) : ?>
-	<?php
+if ( $limitPosts->have_posts() ) :
+
 	/* Start the Loop */
-	while ( $limitToFour->have_posts() ) : $limitToFour->the_post();
+	while ( $limitPosts->have_posts() ) : $limitPosts->the_post();
 		get_template_part( 'template-parts/post/content', get_post_format() );
 	endwhile;
 
@@ -28,7 +28,7 @@ if ( $limitToFour->have_posts() ) : ?>
     <?php
         echo paginate_links( array(
             'base'         => str_replace( 999999999, '%#%', esc_url( get_pagenum_link( 999999999 ) ) ),
-            'total'        => $limitToFour->max_num_pages,
+            'total'        => $limitPosts->max_num_pages,
             'current'      => max( 1, get_query_var( 'paged' ) ),
             'format'       => '?paged=%#%',
             'show_all'     => false,

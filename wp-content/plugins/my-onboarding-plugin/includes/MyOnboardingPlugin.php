@@ -24,6 +24,7 @@ class MyOnboardingPlugin {
 		), 10, 2 );
 		add_action( 'wp_ajax_student_status', array( $this, 'disable_student' ) );
 		add_shortcode( 'student', array( $this, 'display_student' ) );
+		add_action( 'widgets_init', array( $this, 'register_widget' ) );
 	}
 
 	/**
@@ -386,5 +387,11 @@ class MyOnboardingPlugin {
 		wp_reset_postdata();
 
 		return $result;
+	}
+
+	function register_widget()
+	{
+		require_once ( 'MyOnboardingWidget.php');
+		register_widget( 'MyOnboardingWidget' );
 	}
 }

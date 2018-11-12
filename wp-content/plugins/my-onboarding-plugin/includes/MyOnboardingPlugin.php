@@ -26,6 +26,8 @@ class MyOnboardingPlugin {
 		add_shortcode( 'student', array( $this, 'display_student' ) );
 		add_action( 'widgets_init', array( $this, 'register_widget' ) );
 		add_action( 'widgets_init', array( $this, 'my_custom_sidebar' ) );
+		add_action( 'init', array( $this, 'custom_post_type_rest_api_support' ), 25 );
+		add_filter( 'register_post_type_args', array( $this, 'custom_post_type_rest_api_filter' ), 10, 2 );
 	}
 
 	/**
@@ -127,6 +129,7 @@ class MyOnboardingPlugin {
 			'taxonomies'          => array( 'category', 'post_tag' ),
 			'menu_position'       => 0,
 			'exclude_from_search' => false,
+			'show_in_rest'        => true,
 		);
 		register_post_type( 'student', $args );
 	}
@@ -390,22 +393,62 @@ class MyOnboardingPlugin {
 		return $result;
 	}
 
-	function register_widget()
-	{
-		require_once ( 'MyOnboardingWidget.php');
+	/**
+	 * Register Widget
+	 */
+	function register_widget() {
+		require_once( 'MyOnboardingWidget.php' );
 		register_widget( 'MyOnboardingWidget' );
 	}
 
+	/**
+	 * Register Sidebar
+	 */
 	function my_custom_sidebar() {
 		register_sidebar(
-			array (
-				'name' => 'My Sidebar',
-				'id' => 'custom-side-bar',
+			array(
+				'name'          => 'My Sidebar',
+				'id'            => 'custom-side-bar',
 				'before_widget' => '<div class="widget-content">',
-				'after_widget' => "</div>",
-				'before_title' => '<h3 class="widget-title">',
-				'after_title' => '</h3>',
+				'after_widget'  => "</div>",
+				'before_title'  => '<h3 class="widget-title">',
+				'after_title'   => '</h3>',
 			)
 		);
+	}
+
+	/**
+	 * Add Rest API to CPT
+	 */
+	function custom_post_type_rest_api_support() {
+
+		global $wp_post_types;
+
+		$post_type_name = 'student';
+
+		if ( isset( $wp_post_types[ $post_type_name ] ) ) {
+
+			$wp_post_types[ $post_type_name ]->show_in_rest          = true;
+			$wp_post_types[ $post_type_name ]->rest_base             = $post_type_name;
+			$wp_post_types[ $post_type_name ]->rest_controller_class = 'WP_REST_Posts_Controller';
+
+		}
+
+	}
+
+	/**
+	 * Filter the API Response
+	 *
+	 * @param $args
+	 * @param $post_type
+	 *
+	 * @return mixed
+	 */
+	function custom_post_type_rest_api_filter( $args, $post_type ) {
+		if ( 'student' === $post_type ) {
+			$args['show_in_rest'] = true;
+		}
+
+		return $args;
 	}
 }

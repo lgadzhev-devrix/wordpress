@@ -26,6 +26,9 @@ class MyOnboardingPlugin {
 		add_shortcode( 'student', array( $this, 'display_student' ) );
 		add_action( 'widgets_init', array( $this, 'register_widget' ) );
 		add_action( 'widgets_init', array( $this, 'my_custom_sidebar' ) );
+
+		//Custom API Routes
+		add_action( 'rest_api_init', array( $this, 'custom_api_routes' ) );
 	}
 
 	/**
@@ -413,5 +416,24 @@ class MyOnboardingPlugin {
 				'after_title'   => '</h3>',
 			)
 		);
+	}
+
+	function custom_api_routes() {
+		$namespace = 'api';
+
+		register_rest_route( $namespace, '/student', array(
+			'methods'  => 'GET',
+			'callback' => array( $this, 'get_all_students' ),
+		) );
+	}
+
+	function get_all_students( $data ) {
+		$posts = get_posts( array( 'post_type' => 'student' ) );
+
+		if ( empty( $posts ) ) {
+			return null;
+		}
+
+		return $posts;
 	}
 }

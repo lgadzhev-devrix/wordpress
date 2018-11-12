@@ -418,6 +418,9 @@ class MyOnboardingPlugin {
 		);
 	}
 
+	/**
+	 * Create custom REST API routes
+	 */
 	function custom_api_routes() {
 		$namespace = 'api';
 
@@ -425,8 +428,20 @@ class MyOnboardingPlugin {
 			'methods'  => 'GET',
 			'callback' => array( $this, 'get_all_students' ),
 		) );
+
+		register_rest_route( $namespace, '/student/(?P<id>\d+)', array(
+			'methods'  => 'GET',
+			'callback' => array( $this, 'get_single_student' ),
+		) );
 	}
 
+	/**
+	 * Get all student posts
+	 *
+	 * @param $data
+	 *
+	 * @return array|null
+	 */
 	function get_all_students( $data ) {
 		$posts = get_posts( array( 'post_type' => 'student' ) );
 
@@ -435,5 +450,25 @@ class MyOnboardingPlugin {
 		}
 
 		return $posts;
+	}
+
+	/**
+	 * Get single student post by ID
+	 *
+	 * @param $data
+	 *
+	 * @return array|null
+	 */
+	function get_single_student( $data ) {
+		$post = get_posts( array(
+			'p'         => $data['id'],
+			'post_type' => 'student',
+		) );
+
+		if ( empty( $post ) ) {
+			return null;
+		}
+
+		return $post;
 	}
 }

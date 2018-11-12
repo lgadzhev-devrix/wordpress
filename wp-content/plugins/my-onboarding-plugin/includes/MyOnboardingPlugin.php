@@ -419,7 +419,7 @@ class MyOnboardingPlugin {
 	}
 
 	/**
-	 * Create custom REST API routes
+	 * Create custom REST API routes for CRUD for the CPT students
 	 */
 	function custom_api_routes() {
 		$namespace = 'api';
@@ -433,6 +433,21 @@ class MyOnboardingPlugin {
 			'methods'  => 'GET',
 			'callback' => array( $this, 'get_single_student' ),
 		) );
+
+		register_rest_route( $namespace, '/student/(?P<id>\d+)', array(
+			'methods'  => 'DELETE',
+			'callback' => array( $this, 'delete_student' ),
+		) );
+
+		register_rest_route( $namespace, '/student', array(
+			'methods'  => 'POST',
+			'callback' => array( $this, 'insert_student' ),
+		) );
+
+		register_rest_route( $namespace, '/student/(?P<id>\d+)', array(
+			'methods'  => 'PUT',
+			'callback' => array( $this, 'update_student' ),
+		) );
 	}
 
 	/**
@@ -442,7 +457,7 @@ class MyOnboardingPlugin {
 	 *
 	 * @return array|null
 	 */
-	function get_all_students( $data ) {
+	function get_all_students( WP_REST_Request $data ) {
 		$posts = get_posts( array( 'post_type' => 'student' ) );
 
 		if ( empty( $posts ) ) {
@@ -459,7 +474,7 @@ class MyOnboardingPlugin {
 	 *
 	 * @return array|null
 	 */
-	function get_single_student( $data ) {
+	function get_single_student( WP_REST_Request $data ) {
 		$post = get_posts( array(
 			'p'         => $data['id'],
 			'post_type' => 'student',
@@ -470,5 +485,76 @@ class MyOnboardingPlugin {
 		}
 
 		return $post;
+	}
+
+	/**
+	 * Delete student
+	 *
+	 * @param WP_REST_Request $data
+	 *
+	 * @return string
+	 */
+	function delete_student( WP_REST_Request $data ) {
+		$post = get_posts( array(
+			'p'         => $data['id'],
+			'post_type' => 'student',
+		) );
+
+		if ( ! empty( $post ) ) {
+			wp_delete_post( $data['id'] );
+
+			return 'Post deleted!';
+		} else {
+			return "Post doesn't exists!";
+		}
+	}
+
+	/**
+	 * Insert student
+	 *
+	 * @param WP_REST_Request $data
+	 *
+	 * @return array|int|string|WP_Error
+	 */
+	function insert_student( WP_REST_Request $data ) {
+
+		$post = array(
+			'post_type'    => 'student',
+			'post_status'  => 'publish',
+			'post_title'   => esc_attr( $data->get_param( 'title' ) ),
+			'post_content' => esc_attr( $data->get_param( 'content' ) ),
+			'post_excerpt' => esc_attr( $data->get_param( 'excerpt' ) ),
+		);
+
+		$post = wp_insert_post( $post );
+
+		if ( $post ) {
+			return $post;
+		} else {
+			return 'Invalid data!';
+		}
+	}
+
+	/**
+	 * Update student
+	 *
+	 * @param WP_REST_Request $data
+	 *
+	 * @return string
+	 */
+	function update_student( WP_REST_Request $data ) {
+		$post = array(
+			'ID'           => $data['id'],
+			'post_type'    => 'student',
+			'post_title'   => esc_attr( $data->get_param( 'title' ) ),
+			'post_content' => esc_attr( $data->get_param( 'content' ) ),
+			'post_excerpt' => esc_attr( $data->get_param( 'excerpt' ) ),
+		);
+
+		if ( wp_update_post( $post ) ) {
+			return 'Successfully updated!';
+		} else {
+			return 'Update failed!';
+		}
 	}
 }
